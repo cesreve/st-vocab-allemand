@@ -1,40 +1,40 @@
-# French-German Vocabulary App
+# Application de Vocabulaire Français-Allemand
 
-This is a simple Streamlit web application that helps you learn and practice French-German vocabulary. It loads vocabulary data from a CSV file (`data.csv`) and provides a user-friendly interface for browsing, filtering, and listening to the words and phrases.
+Ceci est une application web simple construite avec Streamlit pour vous aider à apprendre et à pratiquer le vocabulaire français-allemand. Elle charge les données de vocabulaire à partir d'un fichier CSV (`data.csv`) et fournit une interface conviviale pour parcourir, filtrer et écouter les mots et les phrases.
 
-## Features
+## Fonctionnalités
 
-- **Filter vocabulary:** Filter words and phrases by category and subcategory.
-- **Listen to pronunciation:** Hear the German pronunciation of each word or phrase using text-to-speech.
-- **Show/Hide columns:** Choose to display French, German, or both columns.
-- **Control the number of words:** Use a slider to adjust the number of vocabulary items displayed.
+- **Filtrer le vocabulaire :** Filtrez les mots et les phrases par catégorie et sous-catégorie.
+- **Écouter la prononciation :** Écoutez la prononciation allemande de chaque mot ou expression à l'aide de la synthèse vocale.
+- **Afficher/Masquer les colonnes :** Choisissez d'afficher les colonnes français, allemand ou les deux.
+- **Contrôler le nombre de mots :** Utilisez un curseur pour ajuster le nombre d'éléments de vocabulaire affichés.
 
-## How to Use
+## Comment l'utiliser
 
-1. **Install Streamlit:** If you don't have Streamlit installed, run `pip install streamlit`.
-2. **Data File:** Make sure you have a CSV file named `data.csv` in the same directory as the app script (`app.py`). The CSV file should have the following columns:
-    - **Category:** The main category of the vocabulary.
-    - **Subcategory:** A more specific subcategory within the main category.
-    - **French:** The French word or phrase.
-    - **Allemand:** The German translation of the French word or phrase.
-3. **Run the app:** Open your terminal, navigate to the directory containing `app.py`, and run `streamlit run app.py`.
-4. **Use the filters:** Select the desired categories and subcategories from the sidebar to filter the vocabulary list.
-5. **Listen and learn:** Click the play button in the "Listen" column to hear the German pronunciation of each word or phrase.
-6. **Customize the display:** Use the checkboxes to show or hide the French and German columns. Adjust the slider to control the number of words displayed.
+1. **Installer Streamlit :** Si vous n'avez pas Streamlit installé, exécutez `pip install streamlit`.
+2. **Fichier de données :** Assurez-vous d'avoir un fichier CSV nommé `data.csv` dans le même répertoire que le script de l'application (`app.py`). Le fichier CSV doit comporter les colonnes suivantes :
+    - **Category :** La catégorie principale du vocabulaire.
+    - **Subcategory :** Une sous-catégorie plus spécifique au sein de la catégorie principale.
+    - **French :** Le mot ou l'expression en français.
+    - **Allemand :** La traduction allemande du mot ou de l'expression en français.
+3. **Exécuter l'application :** Ouvrez votre terminal, accédez au répertoire contenant `app.py` et exécutez `streamlit run app.py`.
+4. **Utiliser les filtres :** Sélectionnez les catégories et sous-catégories souhaitées dans la barre latérale pour filtrer la liste de vocabulaire.
+5. **Écouter et apprendre :** Cliquez sur le bouton de lecture dans la colonne "Listen" pour entendre la prononciation allemande de chaque mot ou expression.
+6. **Personnaliser l'affichage :** Utilisez les cases à cocher pour afficher ou masquer les colonnes français et allemand. Ajustez le curseur pour contrôler le nombre de mots affichés.
 
-## Data File Format
+## Format du fichier de données
 
-The `data.csv` file should be a comma-separated value file with the following columns:
+Le fichier `data.csv` doit être un fichier de valeurs séparées par des virgules avec les colonnes suivantes :
 
 | Category | Subcategory | French | Allemand |
 |---|---|---|---|
-| Greetings | Basic | Bonjour | Guten Tag |
-| Greetings | Formal | Bonsoir | Guten Abend |
+| Salutations | Basique | Bonjour | Guten Tag |
+| Salutations | Formel | Bonsoir | Guten Abend |
 | ... | ... | ... | ... |
 
-## Future Improvements
+## Améliorations futures
 
-- Add more languages.
-- Implement spaced repetition for more effective learning.
-- Allow users to create and save their own vocabulary lists.
-- Make the app mobile-friendly.
+- Ajouter plus de langues.
+- Mettre en œuvre la répétition espacée pour un apprentissage plus efficace.
+- Permettre aux utilisateurs de créer et d'enregistrer leurs propres listes de vocabulaire.
+- Rendre l'application compatible avec les mobiles.
