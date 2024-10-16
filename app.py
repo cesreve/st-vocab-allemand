@@ -39,7 +39,7 @@ with st.sidebar:
 
     # --- Filter Available Categories ---
     selected_categories = st.multiselect(
-        "Select Categories",
+        "Categories",
         df["Category"].unique(),
         default=None,
         key="selected_categories",
@@ -47,7 +47,7 @@ with st.sidebar:
 
     available_subcategories = df.loc[df["Category"].isin(selected_categories), "Subcategory"].unique()
 
-    selected_subcategories = st.multiselect('Select Subcategories', available_subcategories, default=None)
+    selected_subcategories = st.multiselect('Sous-categories', available_subcategories, default=None)
 
 # --- Filter DataFrame ---
 if not len(selected_categories)>0 and not len(available_subcategories)>0:
@@ -60,35 +60,35 @@ else:
     ].copy()
 
     # --- Add TTS Column --- (unchanged)
-    filtered_df.loc[:, 'Listen'] = filtered_df['Allemand'].apply(get_audio_base64)
+    filtered_df.loc[:, 'Écouter'] = filtered_df['Allemand'].apply(get_audio_base64)
 
 
 # --- Show/Hide Columns ---
 col1, col2 = st.columns(2)
 with col1:
-    show_allemand = st.checkbox('Show Allemand', value=True)
+    show_allemand = st.checkbox('Montrer Allemand', value=True)
 with col2:
-    show_french = st.checkbox('Show French', value=st.session_state.show_french)
+    show_french = st.checkbox('Montrer Français', value=st.session_state.show_french)
 
-columns_to_show = ['Category', 'Subcategory', 'Listen', 'Phrase'] 
+columns_to_show = ['Category', 'Subcategory', 'Écouter', 'Phrase'] 
 if show_french and not show_allemand:
-    columns_to_show = ['French', 'Listen', 'Phrase'] 
+    columns_to_show = ['French', 'Écouter', 'Phrase'] 
 if show_allemand and not show_french:
-    columns_to_show = ['Allemand', 'Listen', 'Phrase'] 
+    columns_to_show = ['Allemand', 'Écouter', 'Phrase'] 
 if show_allemand and show_french:
-    columns_to_show = ['French', 'Allemand', 'Listen', 'Phrase'] 
+    columns_to_show = ['French', 'Allemand', 'Écouter', 'Phrase'] 
 
 
 # --- Slider ---
 if len(filtered_df) > 0:
-    num_words = st.slider('Number of Words', min_value=1, max_value=len(filtered_df), value=5)
+    num_words = st.slider('Nombre de mots', min_value=1, max_value=len(filtered_df), value=5)
     displayed_df = filtered_df[columns_to_show].head(num_words)
 
 # --- Display DataFrame with HTML for Audio ---
 if not filtered_df.empty:
     st.write(
         displayed_df.to_html(
-            escape=False, formatters={"Listen": lambda x: x}
+            escape=False, formatters={"Écouter": lambda x: x}
         ),
         unsafe_allow_html=True,
     )
