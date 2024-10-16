@@ -16,7 +16,7 @@ Ceci est une application web simple construite avec Streamlit pour vous aider à
     - **Category :** La catégorie principale du vocabulaire.
     - **Subcategory :** Une sous-catégorie plus spécifique au sein de la catégorie principale.
     - **French :** Le mot ou l'expression en français.
-    - **Allemand :** La traduction allemande du mot ou de l'expression en français.
+    - **Allemand :** La traduction allemande du mot ou de l'expression en français. 
 3. **Exécuter l'application :** Ouvrez votre terminal, accédez au répertoire contenant `app.py` et exécutez `streamlit run app.py`.
 4. **Utiliser les filtres :** Sélectionnez les catégories et sous-catégories souhaitées dans la barre latérale pour filtrer la liste de vocabulaire.
 5. **Écouter et apprendre :** Cliquez sur le bouton de lecture dans la colonne "Listen" pour entendre la prononciation allemande de chaque mot ou expression.
@@ -26,11 +26,11 @@ Ceci est une application web simple construite avec Streamlit pour vous aider à
 
 Le fichier `data.csv` doit être un fichier de valeurs séparées par des virgules avec les colonnes suivantes :
 
-| Category | Subcategory | French | Allemand |
-|---|---|---|---|
-| Salutations | Basique | Bonjour | Guten Tag |
-| Salutations | Formel | Bonsoir | Guten Abend |
-| ... | ... | ... | ... |
+| Category | Subcategory | French | Allemand |  Phrase
+|---|---|---|---|---|
+| Salutations | Basique | Bonjour | Guten Tag | Guten Tag, wie geht es Ihnen? |
+| Salutations | Formel | Bonsoir | Guten Abend | Ich wünsche Ihnen einen schönen guten Abend. |
+| ... | ... | ... | ... | ... |
 
 ## Améliorations futures
 
