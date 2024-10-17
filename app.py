@@ -72,7 +72,7 @@ with col2:
 
 columns_to_show = ['Category', 'Subcategory', 'Écouter', 'Phrase'] 
 if show_french and not show_allemand:
-    columns_to_show = ['French', 'Écouter', 'Phrase'] 
+    columns_to_show = ['French', 'Écouter'] 
 if show_allemand and not show_french:
     columns_to_show = ['Allemand', 'Écouter', 'Phrase'] 
 if show_allemand and show_french:
