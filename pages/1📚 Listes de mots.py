@@ -25,10 +25,7 @@ def load_data():
         st.stop()
 
 # --- Streamlit App ---
-#st.title(':flag-fr: Français-Allemand :flag-de:')
-st.set_page_config(page_title="Vocabulaire Allemand", page_icon=":de:", layout="centered")
-
-st.title('My streamlit app')
+st.title(':flag-fr: Français-Allemand :flag-de:')
 df = load_data()
 # --- Initial Values for Filters and Checkbox ---
 if "show_french" not in st.session_state:

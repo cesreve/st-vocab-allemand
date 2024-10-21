@@ -1,5 +1,8 @@
 import streamlit as st
 
+
+st.set_page_config(page_title="Vocabulaire Allemand", page_icon=":de:", layout="centered")
+
 st.title("Bienvenue sur l'application de vocabulaire français-allemand !")
 
 st.write("""
