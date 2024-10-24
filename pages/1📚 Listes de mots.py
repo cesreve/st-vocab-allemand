@@ -4,6 +4,9 @@ from gtts import gTTS
 import base64
 from io import BytesIO
 
+##################################
+st.set_page_config(page_title="Vocabulaire Allemand", page_icon=":de:", layout="centered")
+##################################
 # --- Helper Function for TTS ---
 @st.cache_data
 def get_audio_base64(text):
