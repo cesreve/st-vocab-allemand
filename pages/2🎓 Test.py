@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import random
 
-
+############################
+st.set_page_config(page_title="Vocabulaire Allemand", page_icon=":de:", layout="centered")
 ############################
 # 1. Charger et préparer les données
 # Remplacez 'votre_dataset.csv' par le nom de votre fichier
