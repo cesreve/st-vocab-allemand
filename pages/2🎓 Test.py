@@ -1,22 +1,18 @@
 import streamlit as st
 import pandas as pd
 import random
-######
-st.set_page_config(page_title="Vocabulaire Allemand", page_icon=":de:", layout="centered")
 
 
+############################
 # 1. Charger et préparer les données
 # Remplacez 'votre_dataset.csv' par le nom de votre fichier
-df = pd.read_csv('data.csv')  
-
-############
+df = pd.read_csv('data2.csv')  
 categories = df["Category"].unique()  
 subcategories = df["Subcategory"].unique()
 
 # --- Sidebar ---
 with st.sidebar:
     st.header("Filtres")
-
     # --- Filter Available Categories ---
     selected_categories = st.multiselect(
         "Categories",
@@ -24,11 +20,8 @@ with st.sidebar:
         default=None,
         key="selected_categories",
     )
-
     available_subcategories = df.loc[df["Category"].isin(selected_categories), "Subcategory"].unique()
-
     selected_subcategories = st.multiselect('Sous-categories', available_subcategories, default=None)
-
 # --- Filter DataFrame ---
 if not len(selected_categories)>0 and not len(available_subcategories)>0:
     st.warning("Please select at least one category or subcategory.")
@@ -38,10 +31,34 @@ else:
         (df["Category"].isin(selected_categories))
         & (df["Subcategory"].isin(selected_subcategories))
     ].copy()
-###########
+#######################################
 mots_francais = df['French'].tolist()
 mots_allemands = df['Allemand'].tolist()
 vocabulaire = dict(zip(mots_francais, mots_allemands))
+#######################################
+def on_change_callback():
+    """This function will be called when the text input's value changes."""
+    print(vocabulaire[st.session_state.mot_francais])
+    if st.session_state.input_text == vocabulaire[st.session_state.mot_francais]:
+        st.success('Bien joué!', icon="✅")
+        st.session_state.answers.append(st.session_state.input_text)
+        st.session_state.questions.append(st.session_state.mot_francais)
+    else:
+        st.error('À réviser!', icon="🚨")
+        st.session_state.answers.append(st.session_state.input_text)
+        st.session_state.questions.append(st.session_state.mot_francais)
+
+# Initialize session state
+if "mot_francais" not in st.session_state:
+    st.session_state.mot_francais = ""
+if "mot_allemand" not in st.session_state:
+    st.session_state.mot_allemand = ""
+if "input_text" not in st.session_state:
+    st.session_state.input_text = ""
+if "answers" not in st.session_state:
+    st.session_state.answers = []
+if "questions" not in st.session_state:
+    st.session_state.questions = []
 
 # 2. Initialiser les compteurs de bonnes/mauvaises réponses
 if 'bonnes_reponses' not in st.session_state:
@@ -53,29 +70,27 @@ if 'mauvaises_reponses' not in st.session_state:
 def choisir_mot():
     return random.choice(mots_francais)
 
-# 4. Bouton pour générer une nouvelle question
-if st.button("Nouvelle question"):
-    st.session_state.mot_actuel = choisir_mot()
+# Reset button
+if st.button("Nouveau mot", type="secondary", icon="💥"):
+    st.session_state.mot_francais = choisir_mot()
+    st.session_state.input_text = ""
+    st.write("Entrez la traduction en allemand (ß):")
+    st.write(st.session_state.mot_francais)
+    st.text_input("Enter some text:", key="input_text", on_change=on_change_callback)
+    
 
-# 5. Afficher un mot français (seulement si un mot est sélectionné)
-if 'mot_actuel' in st.session_state:
-    st.write("Mot français :", st.session_state.mot_actuel)
-    st.session_state.reponse = "" 
+if st.button("Nouvelle session", type="primary"):
+    st.session_state.answers = []
+    st.session_state.questions = []
 
-    # 6. Zone de saisie pour la réponse de l'utilisateur
-    reponse_utilisateur = st.text_input("Entrez la traduction en allemand (ß):", value=None)
+# Create a dataframe from session state data
+df_answers = pd.DataFrame({
+    "Question (Français)": st.session_state.questions,
+    "Réponse de l'utilisateur": st.session_state.answers,
+})
 
-    # 7. Bouton de validation et vérification de la réponse
-    if st.button("Valider"):
-        if reponse_utilisateur == vocabulaire[st.session_state.mot_actuel]:
-            st.session_state.bonnes_reponses += 1
-            st.success("Correct !")
-        else:
-            st.session_state.mauvaises_reponses += 1
-            st.error(f"Incorrect. La bonne réponse est : {vocabulaire[st.session_state.mot_actuel]}")
-        st.session_state.reponse = "" 
-        st.session_state.mot_actuel = choisir_mot() # Choisir un nouveau mot
+# Add a column to indicate correct/incorrect answers
+df_answers["Correct ?"] = df_answers["Question (Français)"].apply(lambda x: vocabulaire.get(x)) == df_answers["Réponse de l'utilisateur"]
 
-# 8. Afficher le compteur de bonnes/mauvaises réponses
-st.write("Bonnes réponses :", st.session_state.bonnes_reponses)
-st.write("Mauvaises réponses :", st.session_state.mauvaises_reponses)
+# Display the dataframe
+st.dataframe(df_answers)
