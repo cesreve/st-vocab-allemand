@@ -32,8 +32,8 @@ else:
         & (df["Subcategory"].isin(selected_subcategories))
     ].copy()
 #######################################
-mots_francais = df['French'].tolist()
-mots_allemands = df['Allemand'].tolist()
+mots_francais = filtered_df['French'].tolist()
+mots_allemands = filtered_df['Allemand'].tolist()
 vocabulaire = dict(zip(mots_francais, mots_allemands))
 #######################################
 def on_change_callback():
