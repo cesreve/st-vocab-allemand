@@ -6,7 +6,7 @@ import random
 ############################
 # 1. Charger et préparer les données
 # Remplacez 'votre_dataset.csv' par le nom de votre fichier
-df = pd.read_csv('data2.csv')  
+df = pd.read_csv('data.csv')  
 categories = df["Category"].unique()  
 subcategories = df["Subcategory"].unique()
 
