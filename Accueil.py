@@ -34,7 +34,7 @@ with st.sidebar:
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Connexion"):
-                if authenticate(st.session_state.username, st.session_state.password):
+                if authenticate():
                     st.success("Connecté avec succès!")
                     st.rerun()  # Rerun to show authenticated content
                 else:
