@@ -1,5 +1,5 @@
 import streamlit as st
-
+from auth import create_user, authenticate
 
 st.set_page_config(page_title="Vocabulaire Allemand", page_icon=":de:", layout="centered")
 
