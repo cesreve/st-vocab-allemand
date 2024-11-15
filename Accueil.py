@@ -39,9 +39,9 @@ with st.sidebar:
                     st.rerun()  # Rerun to show authenticated content
                 else:
                     st.error("Nom d'utilisateur ou mot de passe incorrect.")
-        with col2:
-            if st.button("Créer"):
-                create_user(st.session_state.username, st.session_state.password)
+        #with col2:
+        #   if st.button("Créer"):
+        #        create_user(st.session_state.username, st.session_state.password)
     else:
         if 'username' in st.session_state:
             st.write(f"Bienvenue, {st.session_state.username}!")
