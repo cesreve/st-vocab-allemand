@@ -43,7 +43,8 @@ with st.sidebar:
             if st.button("Créer"):
                 create_user(st.session_state.username, st.session_state.password)
     else:
-        st.write(f"Bienvenue, {st.session_state.username}!")
+        if 'username' in st.session_state:
+            st.write(f"Bienvenue, {st.session_state.username}!")
         if st.button("Déconnexion"):
             st.session_state["authenticated"] = False
             st.rerun()  # Rerun to show login screen
