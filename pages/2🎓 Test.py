@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 
-############################
-st.set_page_config(page_title="Vocabulaire Allemand", page_icon=":de:", layout="centered")
+
 ############################
 # 1. Charger et préparer les données
 # Remplacez 'votre_dataset.csv' par le nom de votre fichier
@@ -26,7 +25,9 @@ with st.sidebar:
 # --- Filter DataFrame ---
 if not len(selected_categories)>0 and not len(available_subcategories)>0:
     st.warning("Please select at least one category or subcategory.")
-    filtered_df = pd.DataFrame(columns=df.columns)  # Empty DataFrame
+    filtered_df=df
+    #filtered_df = pd.DataFrame(columns=df.columns)  # Empty DataFrame
+
 else:
     filtered_df = df[
         (df["Category"].isin(selected_categories))
@@ -40,6 +41,7 @@ vocabulaire = dict(zip(mots_francais, mots_allemands))
 def on_change_callback():
     """This function will be called when the text input's value changes."""
     print(vocabulaire[st.session_state.mot_francais])
+    st.session_state.is_disabled = False
     if st.session_state.input_text == vocabulaire[st.session_state.mot_francais]:
         st.success('Bien joué!', icon="✅")
         st.session_state.answers.append(st.session_state.input_text)
@@ -48,6 +50,8 @@ def on_change_callback():
         st.error('À réviser!', icon="🚨")
         st.session_state.answers.append(st.session_state.input_text)
         st.session_state.questions.append(st.session_state.mot_francais)
+    # Write the result into the database
+    
 
 # Initialize session state
 if "mot_francais" not in st.session_state:
@@ -60,6 +64,10 @@ if "answers" not in st.session_state:
     st.session_state.answers = []
 if "questions" not in st.session_state:
     st.session_state.questions = []
+if 'is_disabled' not in st.session_state:
+    st.session_state.is_disabled = False
+if 'mot_deja_donnes' not in st.session_state:
+    st.session_state.mot_deja_donnes = []
 
 # 2. Initialiser les compteurs de bonnes/mauvaises réponses
 if 'bonnes_reponses' not in st.session_state:
@@ -67,22 +75,37 @@ if 'bonnes_reponses' not in st.session_state:
 if 'mauvaises_reponses' not in st.session_state:
     st.session_state.mauvaises_reponses = 0
 
+
 # 3. Fonction pour choisir un mot français aléatoire
 def choisir_mot():
-    return random.choice(mots_francais)
+    if len(st.session_state.mot_deja_donnes) == len(mots_francais):
+        st.warning("Tous les mots ont été utilisés !")
+        return None  # Or handle this case differently
+    
+    while True:
+        mot_aleatoire = random.choice(mots_francais)
+        if mot_aleatoire not in st.session_state.mot_deja_donnes:
+            st.session_state.mot_deja_donnes.append(mot_aleatoire)
+            return mot_aleatoire
+
+# Fonction pour verouiller le bouton nouveau mot tant qu'une réponse n'est pas entrée
+def lock_button():
+    st.session_state.is_disabled = True
 
 # Reset button
-if st.button("Nouveau mot", type="secondary", icon="💥"):
+if st.button("Nouveau mot", type="secondary", icon="💥", disabled = st.session_state.is_disabled, on_click=lock_button):
     st.session_state.mot_francais = choisir_mot()
     st.session_state.input_text = ""
     st.write("Entrez la traduction en allemand (ß):")
     st.write(st.session_state.mot_francais)
     st.text_input("Enter some text:", key="input_text", on_change=on_change_callback)
     
-
 if st.button("Nouvelle session", type="primary"):
     st.session_state.answers = []
     st.session_state.questions = []
+    st.session_state.mot_deja_donnes = []
+    st.session_state.is_disabled = False
+    st.rerun()
 
 # Create a dataframe from session state data
 df_answers = pd.DataFrame({
