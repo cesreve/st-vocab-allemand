@@ -20,3 +20,30 @@ st.markdown("""
 """)
 
 st.write("Commencez votre apprentissage dès aujourd'hui !")
+
+# --- Sidebar with Login/Signup ---
+with st.sidebar:
+    st.subheader("Authentification")
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
+
+    if not st.session_state["authenticated"]:
+        st.text_input("Nom d'utilisateur", key="username")
+        #st.text_input("Mot de passe", type="password", key="password")
+        st.text_input("Mot de passe", type="password", key="password", on_change=authenticate )
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Connexion"):
+                if authenticate(st.session_state.username, st.session_state.password):
+                    st.success("Connecté avec succès!")
+                    st.rerun()  # Rerun to show authenticated content
+                else:
+                    st.error("Nom d'utilisateur ou mot de passe incorrect.")
+        with col2:
+            if st.button("Créer"):
+                create_user(st.session_state.username, st.session_state.password)
+    else:
+        st.write(f"Bienvenue, {st.session_state.username}!")
+        if st.button("Déconnexion"):
+            st.session_state["authenticated"] = False
+            st.rerun()  # Rerun to show login screen
