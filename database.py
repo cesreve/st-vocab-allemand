@@ -1,5 +1,6 @@
 import psycopg2
 import streamlit as st
+from datetime import datetime
 
 # Get the database URL from environment variable
 DATABASE_URL = st.secrets["my_database"]["DATABASE_URL"]
@@ -13,6 +14,7 @@ def connect_to_db():
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+
 
 def insert_answer(user_id, german_word, is_correct):
     """Inserts the user's answer into the database."""
