@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import random
-
+from database import insert_answer
 
 ############################
 # 1. Charger et préparer les données
@@ -10,6 +10,12 @@ df = pd.read_csv('data.csv')
 categories = df["Category"].unique()  
 subcategories = df["Subcategory"].unique()
 
+
+##########
+if 'username' in st.session_state:
+    st.write(f"Bienvenue, {st.session_state.username}!")
+if 'username' not in st.session_state:
+    st.write("No username found in session state.")
 # --- Sidebar ---
 with st.sidebar:
     st.header("Filtres")
@@ -41,16 +47,27 @@ vocabulaire = dict(zip(mots_francais, mots_allemands))
 def on_change_callback():
     """This function will be called when the text input's value changes."""
     print(vocabulaire[st.session_state.mot_francais])
+    print(st.session_state.username)
     st.session_state.is_disabled = False
-    if st.session_state.input_text == vocabulaire[st.session_state.mot_francais]:
+    is_correct = st.session_state.input_text == vocabulaire[st.session_state.mot_francais]
+    if is_correct:
         st.success('Bien joué!', icon="✅")
-        st.session_state.answers.append(st.session_state.input_text)
-        st.session_state.questions.append(st.session_state.mot_francais)
     else:
         st.error('À réviser!', icon="🚨")
-        st.session_state.answers.append(st.session_state.input_text)
-        st.session_state.questions.append(st.session_state.mot_francais)
+
+    st.session_state.answers.append(st.session_state.input_text)
+    st.session_state.questions.append(st.session_state.mot_francais)
     # Write the result into the database
+    # --- Get the word ---
+    german_word = vocabulaire[st.session_state.mot_francais]
+    # --- Insert Answer into Database ---
+    
+    # Replace with your actual user ID retrieval method (e.g., from session state, etc.):
+    user_id = st.session_state.get("user_id")
+    if user_id:
+        insert_answer(st.session_state.user_id, german_word, is_correct)
+    else:
+        st.warning("User ID not found. Answer not saved to database.")
     
 
 # Initialize session state
