@@ -41,13 +41,15 @@ def authenticate():
     try:
         with psycopg2.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT password FROM users WHERE username = %s", (st.session_state.username,))
+                cur.execute("SELECT password, user_id FROM users WHERE username = %s", (st.session_state.username,))
                 user = cur.fetchone()
                 if user:
                     hashed_password = user[0]
+                    user_id = user[1]
                     if check_hash(st.session_state.password, hashed_password):
                         st.session_state["authenticated"] = True
                         #st.session_state["username"] = username
+                        st.session_state["user_id"] = user_id
                         return True
                 return False
     except psycopg2.Error as e:

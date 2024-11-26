@@ -6,16 +6,28 @@ from database import insert_answer
 ############################
 # 1. Charger et préparer les données
 # Remplacez 'votre_dataset.csv' par le nom de votre fichier
-df = pd.read_csv('data.csv')  
-categories = df["Category"].unique()  
-subcategories = df["Subcategory"].unique()
+# --- Load CSV Data ---
+@st.cache_data
+def load_data():
+    try:
+        data = pd.read_csv("data.csv")
+        return data
+    except FileNotFoundError:
+        st.error("Error: Data file 'data.csv' not found.")
+        st.stop()
+df = load_data()
+
+# categories = df["Category"].unique()  
+# subcategories = df["Subcategory"].unique()
 
 
 ##########
 if 'username' in st.session_state:
-    st.write(f"Bienvenue, {st.session_state.username}!")
-if 'username' not in st.session_state:
-    st.write("No username found in session state.")
+    if len(st.session_state.username)>0:
+        st.write(f"Bienvenue {st.session_state.username}!")
+# if 'username' not in st.session_state:
+#     st.write("No username found in session state.")
+
 # --- Sidebar ---
 with st.sidebar:
     st.header("Filtres")

@@ -27,14 +27,20 @@ def load_data():
         st.error("Error: Data file 'data.csv' not found.")
         st.stop()
 
+df = load_data()
+
 # --- Streamlit App ---
 st.title(':flag-fr: Français-Allemand :flag-de:')
-df = load_data()
+st.write(st.session_state["authenticated"])
+st.write(st.session_state["user_id"])
+
+if 'username' in st.session_state:
+    if len(st.session_state.username)>0:
+        st.write(f"Vous êtes authenthifié en tant que {st.session_state.username}!")
+        
 # --- Initial Values for Filters and Checkbox ---
 if "show_french" not in st.session_state:
     st.session_state.show_french = True
-categories = df["Category"].unique()  
-subcategories = df["Subcategory"].unique()
 
 # --- Sidebar ---
 with st.sidebar:

@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 from database import fetch_answers_from_db
 
-# Database connection URL (from Streamlit secrets)
-DATABASE_URL = st.secrets["my_database"]["DATABASE_URL"]
-
 def fetch_and_join_data(user_id, selected_categories, selected_subcategories):
     """Récupère les données du CSV et de la base de données, les joint et renvoie un DataFrame."""
     try:
@@ -33,7 +30,9 @@ def fetch_and_join_data(user_id, selected_categories, selected_subcategories):
 
 # Streamlit app
 st.title("Merged Data (CSV and Database)")
-
+if 'username' in st.session_state:
+    if len(st.session_state.username)>0:
+        st.write(f"Vous êtes authenthifié en tant que {st.session_state.username}!")
 # --- Sidebar Filters ---
 with st.sidebar:
     st.header("Filtres")
