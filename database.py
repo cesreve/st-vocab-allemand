@@ -1,5 +1,6 @@
 import psycopg2
 import streamlit as st
+import pandas as pd
 from datetime import datetime
 
 # Get the database URL from environment variable
@@ -75,3 +76,32 @@ def fetch_answers_from_db(user_id):
     except psycopg2.Error as e:
         st.error(f"Erreur de base de données: {e}")
         return None
+    
+def update_user_word_learning(conn, user_id, word_id):
+    """Met à jour la table 'user_word_learning' avec la réponse de l'utilisateur.
+    Args:
+    user_id: L'ID de l'utilisateur.
+    word_id: L'ID du mot.
+    """
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cursor = conn.cursor()
+
+        update_query = """
+        INSERT INTO user_word_learning (user_id, word_id) 
+        VALUES (%s, %s)
+        ON CONFLICT (user_id, word_id) 
+        DO UPDATE SET compteur = user_word_learning.compteur + 1, 
+                        derniere_date_mise_a_jour = CURRENT_TIMESTAMP;
+        """
+        cursor.execute(update_query, (user_id, word_id))
+        conn.commit()
+        print(f"Table 'user_word_learning' mise à jour pour user_id: {user_id}, word_id: {word_id}")
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Erreur lors de la mise à jour de la table: {error}")
+
+    finally:
+        if conn:
+            cursor.close()
+            conn.close  
