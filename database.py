@@ -45,3 +45,33 @@ def insert_answer(user_id, german_word, is_correct):
 
     except psycopg2.Error as e:
         st.error(f"Database error: {e}")
+
+def fetch_answers_from_db(user_id):
+    """Récupère les réponses de l'utilisateur depuis la base de données."""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT german_word, answer_date, is_correct
+            FROM (
+                SELECT 
+                    german_word, 
+                    answer_date, 
+                    is_correct,
+                    RANK() OVER (PARTITION BY german_word ORDER BY answer_date DESC) as rank_number
+                FROM answers
+                WHERE user_id = %s
+            ) AS ranked_answers
+            WHERE 1=1
+                AND rank_number = 1
+                AND is_correct;
+                    """, (user_id,))
+        answers_data = cur.fetchall()
+        columns = [desc[0] for desc in cur.description]
+        df_answers = pd.DataFrame(answers_data, columns=columns)
+        cur.close()
+        conn.close()
+        return df_answers
+    except psycopg2.Error as e:
+        st.error(f"Erreur de base de données: {e}")
+        return None
