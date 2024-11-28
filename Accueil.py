@@ -49,3 +49,6 @@ with st.sidebar:
         if st.button("Déconnexion"):
             st.session_state["authenticated"] = False
             st.rerun()  # Rerun to show login screen
+
+
+

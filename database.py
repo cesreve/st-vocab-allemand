@@ -6,6 +6,7 @@ from datetime import datetime
 # Get the database URL from environment variable
 DATABASE_URL = st.secrets["my_database"]["DATABASE_URL"]
 
+# --- connect_to_db
 def connect_to_db():
     """Connects to PostgreSQL, creates a table, and queries it."""
     conn = None
@@ -16,29 +17,18 @@ def connect_to_db():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
-
-def insert_answer(user_id, german_word, is_correct):
+# --- insert_answer
+def insert_answer(user_id, word_id, is_correct):  # Add word_id as a parameter
     """Inserts the user's answer into the database."""
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
-
-        # Create the answers table if it doesn't exist
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS answers (
-                id SERIAL PRIMARY KEY,
-                user_id INT NOT NULL,
-                german_word VARCHAR(255) NOT NULL,
-                is_correct BOOLEAN,
-                answer_date TIMESTAMP
-            );
-        """)
-
-        # Insert the answer data
-        cur.execute("""
-            INSERT INTO answers (user_id, german_word, is_correct, answer_date)
+        # Insert the answer data.
+        insert_query = """
+            INSERT INTO answers (user_id, word_id, is_correct, answer_date)
             VALUES (%s, %s, %s, %s);
-        """, (user_id, german_word, is_correct, datetime.now()))
+        """
+        cur.execute(insert_query, (user_id, word_id, is_correct, datetime.now()))  # Pass word_id
 
         conn.commit()
         cur.close()
@@ -47,6 +37,7 @@ def insert_answer(user_id, german_word, is_correct):
     except psycopg2.Error as e:
         st.error(f"Database error: {e}")
 
+# --- fetch_answers_from_db
 def fetch_answers_from_db(user_id):
     """Récupère les réponses de l'utilisateur depuis la base de données."""
     try:
@@ -76,7 +67,8 @@ def fetch_answers_from_db(user_id):
     except psycopg2.Error as e:
         st.error(f"Erreur de base de données: {e}")
         return None
-    
+
+# --- update_user_word_learning
 def update_user_word_learning(conn, user_id, word_id):
     """Met à jour la table 'user_word_learning' avec la réponse de l'utilisateur.
     Args:
@@ -105,3 +97,62 @@ def update_user_word_learning(conn, user_id, word_id):
         if conn:
             cursor.close()
             conn.close  
+
+# --- get_categories_and_subcategories
+@st.cache_data  # Cache the result for performance
+def get_categories_and_subcategories():
+    """Fetches categories and their subcategories from the database and stores them in session state."""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        query = """
+            SELECT category, string_agg(DISTINCT subcategory, ', ') AS subcategories
+            FROM words
+            GROUP BY category;
+        """
+        df_categories = pd.read_sql_query(query, conn)  # Use pandas for easy DataFrame creation
+        conn.close()
+        st.session_state.categories_df = df_categories  # Store in session state
+        return df_categories # return for usage if required
+
+    except psycopg2.Error as e:
+        st.error(f"Database error: {e}")
+        return None  # Return None to indicate an error
+
+# --- get_words_to_review
+@st.cache_data
+def get_words_to_review(user_id, review_interval_days, selected_categories=None, selected_subcategories=None):
+    """Retrieves words the user needs to review based on the review interval and filters."""
+
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+
+        query = """
+            SELECT w.word_id, w.french_word, w.german_word, w.category, w.subcategory, w.example_sentence
+            FROM words w
+            LEFT JOIN user_word_learning uwl ON w.word_id = uwl.word_id AND uwl.user_id = %s
+            WHERE (uwl.derniere_date_mise_a_jour IS NULL OR uwl.derniere_date_mise_a_jour < CURRENT_DATE - %s * INTERVAL '1 day')
+        """
+        params = [user_id, review_interval_days]
+
+
+        if selected_categories:
+            query += " AND w.category IN %s"
+            params.append(tuple(selected_categories))
+
+        if selected_subcategories:
+            query += " AND w.subcategory IN %s"
+            params.append(tuple(selected_subcategories))
+
+        query += ";"
+
+        cur.execute(query, params)
+        rows = cur.fetchall()
+        columns = [desc[0] for desc in cur.description]
+        df_to_review = pd.DataFrame(rows, columns=columns)
+        conn.close()
+        return df_to_review
+
+    except psycopg2.Error as e:
+        st.error(f"Database error: {e}")
+        return None

@@ -48,7 +48,6 @@ def authenticate():
                     user_id = user[1]
                     if check_hash(st.session_state.password, hashed_password):
                         st.session_state["authenticated"] = True
-                        #st.session_state["username"] = username
                         st.session_state["user_id"] = user_id
                         return True
                 return False

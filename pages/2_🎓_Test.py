@@ -32,24 +32,30 @@ if 'username' in st.session_state:
 with st.sidebar:
     st.header("Filtres")
     # --- Filter Available Categories ---
-    selected_categories = st.multiselect(
-        "Categories",
-        df["Category"].unique(),
-        default=None,
-        key="selected_categories",
+    st.session_state.selected_categories = st.multiselect(
+        label="Categories",
+        options=df["Category"].unique(),
+        default=st.session_state.get("selected_categories", [])
     )
-    available_subcategories = df.loc[df["Category"].isin(selected_categories), "Subcategory"].unique()
-    selected_subcategories = st.multiselect('Sous-categories', available_subcategories, default=None)
+
+    # --- Filter Available Subcategories ---
+    st.session_state.selected_subcategories = st.multiselect(
+        label='Sous-categories', 
+        options=df.loc[df["Category"].isin(st.session_state.selected_categories), "Subcategory"].unique(),
+        default=list(set(df.loc[df["Category"].isin(st.session_state.selected_categories), "Subcategory"].unique())
+                                 & set(st.session_state.get("selected_subcategories", []))
+                            ) 
+    )
 # --- Filter DataFrame ---
-if not len(selected_categories)>0 and not len(available_subcategories)>0:
+if not len(st.session_state.selected_categories)>0 and not len(st.session_state.selected_subcategories)>0:
     st.warning("Please select at least one category or subcategory.")
     filtered_df=df
     #filtered_df = pd.DataFrame(columns=df.columns)  # Empty DataFrame
 
 else:
     filtered_df = df[
-        (df["Category"].isin(selected_categories))
-        & (df["Subcategory"].isin(selected_subcategories))
+        (df["Category"].isin(st.session_state.selected_categories))
+        & (df["Subcategory"].isin(st.session_state.selected_subcategories))
     ].copy()
 #######################################
 mots_francais = filtered_df['French'].tolist()
