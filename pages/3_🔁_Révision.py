@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import random
-from database import insert_answer, get_words_to_review2, get_categories_and_subcategories
+from database import insert_answer, get_words_to_review, get_categories_and_subcategories
 
 ############################
 # --- Category and Subcategory Selection ---
@@ -21,7 +21,7 @@ user_id = st.session_state.get("user_id")
 if not user_id:
     st.warning("Please log in to view words to review.")
     st.stop()  # Stop execution if not logged in
-words_to_review_df = get_words_to_review2(user_id, selected_categories, selected_subcategories)
+words_to_review_df = get_words_to_review(user_id, selected_categories, selected_subcategories)
 #######################################
 mots_francais = words_to_review_df['french_word'].tolist()
 mots_allemands = words_to_review_df['german_word'].tolist()
@@ -105,5 +105,5 @@ if st.button("Nouvelle session", type="primary"):
     st.session_state.questions = []
     st.session_state.mot_deja_donnes = []
     st.session_state.is_disabled = False
-    get_words_to_review2.clear()
+    get_words_to_review.clear()
     st.rerun()

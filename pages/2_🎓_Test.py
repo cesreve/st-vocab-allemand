@@ -1,65 +1,26 @@
 import streamlit as st
 import pandas as pd
 import random
-from database import insert_answer
+from database import get_words, get_categories_and_subcategories
 
 ############################
-# 1. Charger et préparer les données
-# Remplacez 'votre_dataset.csv' par le nom de votre fichier
-# --- Load CSV Data ---
-@st.cache_data
-def load_data():
-    try:
-        data = pd.read_csv("data.csv")
-        return data
-    except FileNotFoundError:
-        st.error("Error: Data file 'data.csv' not found.")
-        st.stop()
-df = load_data()
-
-# categories = df["Category"].unique()  
-# subcategories = df["Subcategory"].unique()
-
-
-##########
-if 'username' in st.session_state:
-    if len(st.session_state.username)>0:
-        st.write(f"Bienvenue {st.session_state.username}!")
-# if 'username' not in st.session_state:
-#     st.write("No username found in session state.")
-
-# --- Sidebar ---
+# --- Category and Subcategory Selection ---
 with st.sidebar:
     st.header("Filtres")
-    # --- Filter Available Categories ---
-    st.session_state.selected_categories = st.multiselect(
-        label="Categories",
-        options=df["Category"].unique(),
-        default=st.session_state.get("selected_categories", [])
-    )
+    df_categories = get_categories_and_subcategories()
+    selected_categories = st.multiselect("Categories", df_categories['category'].tolist(), key="categories")
 
-    # --- Filter Available Subcategories ---
-    st.session_state.selected_subcategories = st.multiselect(
-        label='Sous-categories', 
-        options=df.loc[df["Category"].isin(st.session_state.selected_categories), "Subcategory"].unique(),
-        default=list(set(df.loc[df["Category"].isin(st.session_state.selected_categories), "Subcategory"].unique())
-                                 & set(st.session_state.get("selected_subcategories", []))
-                            ) 
-    )
-# --- Filter DataFrame ---
-if not len(st.session_state.selected_categories)>0 and not len(st.session_state.selected_subcategories)>0:
-    st.warning("Please select at least one category or subcategory.")
-    filtered_df=df
-    #filtered_df = pd.DataFrame(columns=df.columns)  # Empty DataFrame
+    available_subcategories = []
+    if selected_categories:
+        subcategories_filtered = df_categories[df_categories['category'].isin(selected_categories)]['subcategories'].unique()
+        available_subcategories = list(set(', '.join(subcategories_filtered).split(', '))) if subcategories_filtered.size > 0 else []
+    selected_subcategories = st.multiselect("Subcategories", available_subcategories, key="subcategories")
 
-else:
-    filtered_df = df[
-        (df["Category"].isin(st.session_state.selected_categories))
-        & (df["Subcategory"].isin(st.session_state.selected_subcategories))
-    ].copy()
+words_to_review_df = get_words(selected_categories, selected_subcategories)
+
 #######################################
-mots_francais = filtered_df['French'].tolist()
-mots_allemands = filtered_df['Allemand'].tolist()
+mots_francais = words_to_review_df['french_word'].tolist()
+mots_allemands = words_to_review_df['german_word'].tolist()
 vocabulaire = dict(zip(mots_francais, mots_allemands))
 #######################################
 def on_change_callback():
@@ -75,17 +36,6 @@ def on_change_callback():
 
     st.session_state.answers.append(st.session_state.input_text)
     st.session_state.questions.append(st.session_state.mot_francais)
-    # Write the result into the database
-    # --- Get the word ---
-    german_word = vocabulaire[st.session_state.mot_francais]
-    # --- Insert Answer into Database ---
-    
-    # Replace with your actual user ID retrieval method (e.g., from session state, etc.):
-    user_id = st.session_state.get("user_id")
-    if user_id:
-        insert_answer(st.session_state.user_id, german_word, is_correct)
-    else:
-        st.warning("User ID not found. Answer not saved to database.")
     
 
 # Initialize session state
@@ -103,12 +53,6 @@ if 'is_disabled' not in st.session_state:
     st.session_state.is_disabled = False
 if 'mot_deja_donnes' not in st.session_state:
     st.session_state.mot_deja_donnes = []
-
-# 2. Initialiser les compteurs de bonnes/mauvaises réponses
-if 'bonnes_reponses' not in st.session_state:
-    st.session_state.bonnes_reponses = 0
-if 'mauvaises_reponses' not in st.session_state:
-    st.session_state.mauvaises_reponses = 0
 
 
 # 3. Fonction pour choisir un mot français aléatoire

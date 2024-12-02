@@ -119,23 +119,20 @@ def get_categories_and_subcategories():
         return None  # Return None to indicate an error
 
 # --- get_words_to_review
-#@st.cache_data
-def get_words_to_review(user_id, review_interval_days, selected_categories=None, selected_subcategories=None): 
-    """Retrieves words the user needs to review based on the review interval and filters."""
+@st.cache_data
+def get_words(selected_categories=None, selected_subcategories=None): 
+    """Retrieves words based on the filters."""
 
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
 
         query = """
-            SELECT w.word_id, w.french_word, w.german_word, w.category, w.subcategory, w.example_sentence
+            SELECT w.word_id, w.french_word, w.german_word, w.category, w.subcategory
             FROM words w
-            LEFT JOIN user_word_learning uwl ON w.word_id = uwl.word_id AND uwl.user_id = %s
             WHERE 1=1
-                and (uwl.derniere_date_mise_a_jour IS NULL OR uwl.derniere_date_mise_a_jour < NOW() - %s * INTERVAL '1 day')
         """
-        params = [user_id, review_interval_days]
-
+        params = []
 
         if selected_categories:
             query += " AND w.category IN %s"
@@ -163,7 +160,7 @@ def get_words_to_review(user_id, review_interval_days, selected_categories=None,
 
 # -------------------
 @st.cache_data
-def get_words_to_review2(user_id, selected_categories=None, selected_subcategories=None):
+def get_words_to_review(user_id, selected_categories=None, selected_subcategories=None):
     """Retrieves words the user needs to review, filtering by category and subcategory."""
 
     try:
