@@ -119,8 +119,8 @@ def get_categories_and_subcategories():
         return None  # Return None to indicate an error
 
 # --- get_words_to_review
-@st.cache_data
-def get_words_to_review(user_id, review_interval_days, selected_categories=None, selected_subcategories=None):
+#@st.cache_data
+def get_words_to_review(user_id, review_interval_days, selected_categories=None, selected_subcategories=None): 
     """Retrieves words the user needs to review based on the review interval and filters."""
 
     try:
@@ -131,10 +131,78 @@ def get_words_to_review(user_id, review_interval_days, selected_categories=None,
             SELECT w.word_id, w.french_word, w.german_word, w.category, w.subcategory, w.example_sentence
             FROM words w
             LEFT JOIN user_word_learning uwl ON w.word_id = uwl.word_id AND uwl.user_id = %s
-            WHERE (uwl.derniere_date_mise_a_jour IS NULL OR uwl.derniere_date_mise_a_jour < CURRENT_DATE - %s * INTERVAL '1 day')
+            WHERE 1=1
+                and (uwl.derniere_date_mise_a_jour IS NULL OR uwl.derniere_date_mise_a_jour < NOW() - %s * INTERVAL '1 day')
         """
         params = [user_id, review_interval_days]
 
+
+        if selected_categories:
+            query += " AND w.category IN %s"
+            params.append(tuple(selected_categories))
+
+        if selected_subcategories:
+            query += " AND w.subcategory IN %s"
+            params.append(tuple(selected_subcategories))
+
+        query += ";"
+
+        cur.execute(query, params)
+        rows = cur.fetchall()
+        columns = [desc[0] for desc in cur.description]
+        df_to_review = pd.DataFrame(rows, columns=columns)
+        conn.close()
+        return df_to_review
+
+    except psycopg2.Error as e:
+        st.error(f"Database error: {e}")
+        return None
+    
+
+
+
+# -------------------
+@st.cache_data
+def get_words_to_review2(user_id, selected_categories=None, selected_subcategories=None):
+    """Retrieves words the user needs to review, filtering by category and subcategory."""
+
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+
+        query = """
+            SELECT w.word_id, w.french_word, w.german_word, w.category, w.subcategory, w.example_sentence
+            FROM words w
+            LEFT JOIN user_word_learning uwl ON w.word_id = uwl.word_id AND uwl.user_id = %s
+            WHERE (uwl.derniere_date_mise_a_jour IS NULL)  -- Always review words never seen
+        """  # Removed the date check
+        query = """
+            SELECT 
+                w.word_id, 
+                w.french_word, 
+                w.german_word, 
+                w.category, 
+                w.subcategory
+            FROM 
+                words w
+            LEFT JOIN 
+                user_word_learning uwl ON w.word_id = uwl.word_id AND uwl.user_id = %s
+            WHERE 1=1
+                AND CASE
+                    -- mot pas encore vu    
+                    WHEN uwl.derniere_date_mise_a_jour IS NULL THEN TRUE 
+	                -- conditions sur le commpteur
+                    WHEN uwl.compteur = 0 THEN TRUE
+                    WHEN uwl.compteur = 1 AND uwl.derniere_date_mise_a_jour < NOW() - 1 * INTERVAL '1 day' THEN TRUE
+                    WHEN uwl.compteur = 2 AND uwl.derniere_date_mise_a_jour < NOW() - 3 * INTERVAL '1 day' THEN TRUE
+                    WHEN uwl.compteur = 3 AND uwl.derniere_date_mise_a_jour < NOW() - 6 * INTERVAL '1 day' THEN TRUE
+                    WHEN uwl.compteur = 4 AND uwl.derniere_date_mise_a_jour < NOW() - 15 * INTERVAL '1 day' THEN TRUE
+                    WHEN uwl.compteur = 5 AND uwl.derniere_date_mise_a_jour < NOW() - 30 * INTERVAL '1 day' THEN TRUE
+                    ELSE FALSE
+                END
+    """
+        
+        params = [user_id]
 
         if selected_categories:
             query += " AND w.category IN %s"

@@ -1,20 +1,9 @@
 import streamlit as st
 import pandas as pd
 import random
-from database import get_words_to_review, get_categories_and_subcategories, insert_answer
+from database import insert_answer, get_words_to_review2, get_categories_and_subcategories
 
-# --- User Authentication Check ---
-user_id = st.session_state.get("user_id")
-if not user_id:
-    st.warning("Please log in to view words to review.")
-    st.stop()  # Stop execution if not logged in
-
-
-st.title("Words to Review")
-
-# --- Review Interval ---
-review_interval = st.number_input("Review Interval (Days)", min_value=1, value=3, key="review_interval")
-
+############################
 # --- Category and Subcategory Selection ---
 with st.sidebar:
     st.header("Filtres")
@@ -28,62 +17,93 @@ with st.sidebar:
     selected_subcategories = st.multiselect("Subcategories", available_subcategories, key="subcategories")
 
 
-# --- Fetch Words to Review ---
-words_to_review_df = get_words_to_review(user_id, review_interval, selected_categories, selected_subcategories)
+user_id = st.session_state.get("user_id")
+if not user_id:
+    st.warning("Please log in to view words to review.")
+    st.stop()  # Stop execution if not logged in
+words_to_review_df = get_words_to_review2(user_id, selected_categories, selected_subcategories)
+#######################################
+mots_francais = words_to_review_df['french_word'].tolist()
+mots_allemands = words_to_review_df['german_word'].tolist()
+vocabulaire = dict(zip(mots_francais, mots_allemands))
+word_ids = dict(zip(mots_francais, words_to_review_df['word_id'].tolist()))
+#######################################
+def on_change_callback():
+    """This function will be called when the text input's value changes."""
+    st.session_state.is_disabled = False
+    word_id = word_ids.get(st.session_state.mot_francais)
+    is_correct = st.session_state.input_text == vocabulaire[st.session_state.mot_francais]
+    if is_correct:
+        st.success('Bien joué!', icon="✅")
+    else:
+        st.error('À réviser!', icon="🚨")
 
-if words_to_review_df is not None and not words_to_review_df.empty:
-    # --- Quiz Setup and Interaction ---
-    mots_francais = words_to_review_df['french_word'].tolist()
-    vocabulaire = dict(zip(mots_francais, words_to_review_df['german_word'].tolist()))
-    word_ids = dict(zip(mots_francais, words_to_review_df['word_id'].tolist()))
+    st.session_state.answers.append(st.session_state.input_text)
+    st.session_state.questions.append(st.session_state.mot_francais)
+    user_id = st.session_state.get("user_id")
+    if user_id:
+        insert_answer(st.session_state.user_id, word_id, is_correct)
+    else:
+        st.warning("User ID not found. Answer not saved to database.")
+    
 
-    if "mot_francais" not in st.session_state:
-        st.session_state.mot_francais = random.choice(mots_francais) # Initialize with a random word
-    if "answers" not in st.session_state:
-        st.session_state.answers = []
-    if "questions" not in st.session_state:
-        st.session_state.questions = []
+# Initialize session state
+if "mot_francais" not in st.session_state:
+    st.session_state.mot_francais = ""
+if "mot_allemand" not in st.session_state:
+    st.session_state.mot_allemand = ""
+if "input_text" not in st.session_state:
+    st.session_state.input_text = ""
+if "answers" not in st.session_state:
+    st.session_state.answers = []
+if "questions" not in st.session_state:
+    st.session_state.questions = []
+if 'is_disabled' not in st.session_state:
+    st.session_state.is_disabled = False
+if 'mot_deja_donnes' not in st.session_state:
+    st.session_state.mot_deja_donnes = []
 
+# --- Fonction pour choisir un mot français aléatoire
+def choisir_mot():
+    if len(st.session_state.mot_deja_donnes) == len(mots_francais):
+        st.warning("Tous les mots ont été utilisés !")
+        return None  # Or handle this case differently
+    
+    while True:
+        mot_aleatoire = random.choice(mots_francais)
+        if mot_aleatoire not in st.session_state.mot_deja_donnes:
+            st.session_state.mot_deja_donnes.append(mot_aleatoire)
+            return mot_aleatoire
 
-    def on_change_callback():
-        german_word = vocabulaire.get(st.session_state.mot_francais) # Handle potential KeyError
-        word_id = word_ids.get(st.session_state.mot_francais) # Handle potential KeyError
-        is_correct = st.session_state.input_text == german_word if german_word else False # Handle missing word case
+# --- Fonction pour verouiller le bouton nouveau mot tant qu'une réponse n'est pas entrée
+def lock_button():
+    st.session_state.is_disabled = True
 
-        # Database insertion is done directly here
-        insert_answer(user_id, word_id, is_correct)
-        
-        if is_correct:
-             st.success('Bien joué!', icon="✅")
-        elif german_word:  # Only show error if the word exists
-             st.error('À réviser!', icon="🚨")
-
-        st.session_state.answers.append(st.session_state.input_text)
-        st.session_state.questions.append(st.session_state.mot_francais)
-
-        # Choose a new random word after answering
-        remaining_words = [word for word in mots_francais if word != st.session_state.mot_francais]
-        if remaining_words:
-            st.session_state.mot_francais = random.choice(remaining_words)
-        else:
-            st.warning("All words reviewed!")
-        st.rerun()
-
+# Reset button
+if st.button("Nouveau mot", type="secondary", icon="💥", disabled = st.session_state.is_disabled, on_click=lock_button):
+    st.session_state.mot_francais = choisir_mot()
+    st.session_state.input_text = ""
+    st.write("Entrez la traduction en allemand (ß):")
     st.write(st.session_state.mot_francais)
     st.text_input("Enter some text:", key="input_text", on_change=on_change_callback)
+    
 
+# Create a dataframe from session state data
+df_answers = pd.DataFrame({
+    "Question (Français)": st.session_state.questions,
+    "Réponse de l'utilisateur": st.session_state.answers,
+})
 
+# Add a column to indicate correct/incorrect answers
+df_answers["Correct ?"] = df_answers["Question (Français)"].apply(lambda x: vocabulaire.get(x)) == df_answers["Réponse de l'utilisateur"]
 
-    # --- Display Answers ---
-    df_answers = pd.DataFrame({
-        "Question (Français)": st.session_state.questions,
-        "Réponse de l'utilisateur": st.session_state.answers,
-    })
-    df_answers["Correct ?"] = df_answers.apply(lambda row: vocabulaire.get(row["Question (Français)"]) == row["Réponse de l'utilisateur"], axis=1)
-    st.dataframe(df_answers)
+# Display the dataframe
+st.dataframe(df_answers)
 
-
-elif words_to_review_df is not None:
-    st.write("No words to review based on your selection and review interval.")
-
-
+if st.button("Nouvelle session", type="primary"):
+    st.session_state.answers = []
+    st.session_state.questions = []
+    st.session_state.mot_deja_donnes = []
+    st.session_state.is_disabled = False
+    get_words_to_review2.clear()
+    st.rerun()
