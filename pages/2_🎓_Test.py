@@ -25,15 +25,12 @@ vocabulaire = dict(zip(mots_francais, mots_allemands))
 #######################################
 def on_change_callback():
     """This function will be called when the text input's value changes."""
-    print(vocabulaire[st.session_state.mot_francais])
-    print(st.session_state.username)
     st.session_state.is_disabled = False
     is_correct = st.session_state.input_text == vocabulaire[st.session_state.mot_francais]
     if is_correct:
         st.success('Bien joué!', icon="✅")
     else:
         st.error('À réviser!', icon="🚨")
-
     st.session_state.answers.append(st.session_state.input_text)
     st.session_state.questions.append(st.session_state.mot_francais)
     
