@@ -40,7 +40,7 @@ def read_and_validate_csv(csv_file):
 
 
 # 3. Function to insert data into PostgreSQL
-def insert_data_into_db(conn, data):
+def insert_data_into_db(db_url, data):
     """
     Inserts validated data into the PostgreSQL table.
 
@@ -48,6 +48,7 @@ def insert_data_into_db(conn, data):
         conn: psycopg2 connection object.
         data (List[Word]): List of validated Word objects.
     """
+    conn = psycopg2.connect(db_url)
     cursor = conn.cursor()
     for word in data:
         try:
@@ -64,25 +65,3 @@ def insert_data_into_db(conn, data):
             print(f"Error inserting data: {e}")
             conn.rollback()  # Rollback in case of error
     cursor.close()
-
-
-if __name__ == "__main__":
-    csv_file = 'your_data.csv'  # Replace with your CSV file path
-    conn_params = {
-        'host': 'your_host',
-        'database': 'your_database',
-        'user': 'your_user',
-        'password': 'your_password'
-    }
-
-    try:
-        conn = psycopg2.connect(**conn_params)
-        validated_data = read_and_validate_csv(csv_file)
-        if validated_data:
-            insert_data_into_db(conn, validated_data)
-            print("Data inserted successfully!")
-    except psycopg2.Error as e:
-        print(f"Database connection error: {e}")
-    finally:
-        if conn:
-            conn.close()

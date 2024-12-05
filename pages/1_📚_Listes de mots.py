@@ -3,6 +3,7 @@ import pandas as pd
 from gtts import gTTS
 import base64
 from io import BytesIO
+from database import get_words, get_categories_and_subcategories
 
 ##################################
 st.set_page_config(page_title="Vocabulaire Allemand", page_icon=":de:", layout="centered")
@@ -18,21 +19,17 @@ def get_audio_base64(text):
     return f'<audio controls src="data:audio/mpeg;base64,{b64}"/>'
 
 # --- Load CSV Data ---
-@st.cache_data
-def load_data():
-    try:
-        data = pd.read_csv("data.csv")
-        return data
-    except FileNotFoundError:
-        st.error("Error: Data file 'data.csv' not found.")
-        st.stop()
-
-df = load_data()
+# @st.cache_data
+# def load_data():
+#     try:
+#         data = pd.read_csv("data.csv")
+#         return data
+#     except FileNotFoundError:
+#         st.error("Error: Data file 'data.csv' not found.")
+#         st.stop()
 
 # --- Streamlit App ---
 st.title(':flag-fr: Français-Allemand :flag-de:')
-# st.write(st.session_state["authenticated"])
-# st.write(st.session_state["user_id"])
 
 if 'username' in st.session_state:
     if len(st.session_state.username)>0:
@@ -45,22 +42,32 @@ if "show_french" not in st.session_state:
 # --- Sidebar ---
 with st.sidebar:
     st.header("Filtres")
+    df_categories = get_categories_and_subcategories()
+    selected_categories = st.multiselect("Categories", df_categories['category'].tolist(), key="categories")
 
-    # --- Filter Available Categories ---
-    st.session_state.selected_categories = st.multiselect(
-        label="Categories",
-        options=df["Category"].unique(),
-        default=st.session_state.get("selected_categories", [])
-    )
+    available_subcategories = []
+    if selected_categories:
+        subcategories_filtered = df_categories[df_categories['category'].isin(selected_categories)]['subcategories'].unique()
+        available_subcategories = list(set(', '.join(subcategories_filtered).split(', '))) if subcategories_filtered.size > 0 else []
+    selected_subcategories = st.multiselect("Subcategories", available_subcategories, key="subcategories")
 
-    # --- Filter Available Subcategories ---
-    st.session_state.selected_subcategories = st.multiselect(
-        label='Sous-categories', 
-        options=df.loc[df["Category"].isin(st.session_state.selected_categories), "Subcategory"].unique(),
-        default=list(set(df.loc[df["Category"].isin(st.session_state.selected_categories), "Subcategory"].unique())
-                                 & set(st.session_state.get("selected_subcategories", []))
-                            ) 
-    )
+    # # --- Filter Available Categories ---
+    # st.session_state.selected_categories = st.multiselect(
+    #     label="Categories",
+    #     options=df["Category"].unique(),
+    #     default=st.session_state.get("selected_categories", [])
+    # )
+
+    # # --- Filter Available Subcategories ---
+    # st.session_state.selected_subcategories = st.multiselect(
+    #     label='Sous-categories', 
+    #     options=df.loc[df["Category"].isin(st.session_state.selected_categories), "Subcategory"].unique(),
+    #     default=list(set(df.loc[df["Category"].isin(st.session_state.selected_categories), "Subcategory"].unique())
+    #                              & set(st.session_state.get("selected_subcategories", []))
+    #                         ) 
+    # )
+
+df = get_words(selected_categories, selected_subcategories)
 
 # --- Filter DataFrame ---
 if not len(st.session_state.selected_categories)>0 and not len(st.session_state.selected_subcategories)>0:

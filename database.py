@@ -128,7 +128,7 @@ def get_words(selected_categories=None, selected_subcategories=None):
         cur = conn.cursor()
 
         query = """
-            SELECT w.word_id, w.french_word, w.german_word, w.category, w.subcategory
+            SELECT w.word_id, w.french_word, w.german_word, w.category, w.subcategory, w.example_sentence
             FROM words w
             WHERE 1=1
         """
@@ -166,13 +166,7 @@ def get_words_to_review(user_id, selected_categories=None, selected_subcategorie
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
-
-        query = """
-            SELECT w.word_id, w.french_word, w.german_word, w.category, w.subcategory, w.example_sentence
-            FROM words w
-            LEFT JOIN user_word_learning uwl ON w.word_id = uwl.word_id AND uwl.user_id = %s
-            WHERE (uwl.derniere_date_mise_a_jour IS NULL)  -- Always review words never seen
-        """  # Removed the date check
+        
         query = """
             SELECT 
                 w.word_id, 

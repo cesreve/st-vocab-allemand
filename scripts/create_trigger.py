@@ -1,6 +1,6 @@
 import psycopg2
 
-def create_trigger_and_function(conn):
+def create_trigger_and_function(db_url):
     """
     Creates the trigger and function in PostgreSQL to update user_word_learning.
 
@@ -8,6 +8,7 @@ def create_trigger_and_function(conn):
         conn: psycopg2 connection object.
     """
     try:
+        conn = psycopg2.connect(db_url)
         cursor = conn.cursor()
 
         # Create the function

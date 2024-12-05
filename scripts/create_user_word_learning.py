@@ -1,12 +1,13 @@
 import psycopg2
 
-def create_user_word_learning_table(conn):
+def create_user_word_learning_table(db_url):
   """Crée la table 'user_word_learning' dans la base de données PostgreSQL.
 
   Args:
     conn: Un objet de connexion psycopg2 à la base de données.
   """
   try:
+    conn = psycopg2.connect(db_url)
     cursor = conn.cursor()
 
     create_table_query = """
