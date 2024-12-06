@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from gtts import gTTS
 import base64
 from io import BytesIO
