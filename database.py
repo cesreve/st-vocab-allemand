@@ -2,6 +2,7 @@ import psycopg2
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from typing import List
 
 # Get the database URL from environment variable
 DATABASE_URL = st.secrets["my_database"]["DATABASE_URL"]
@@ -118,7 +119,7 @@ def get_categories_and_subcategories():
         st.error(f"Database error: {e}")
         return None  # Return None to indicate an error
 
-# --- get_words_to_review
+# --- Get all words based on category and subcategory
 @st.cache_data
 def get_words(selected_categories=None, selected_subcategories=None): 
     """Retrieves words based on the filters."""
@@ -155,10 +156,7 @@ def get_words(selected_categories=None, selected_subcategories=None):
         st.error(f"Database error: {e}")
         return None
     
-
-
-
-# -------------------
+# --- Get words to review
 @st.cache_data
 def get_words_to_review(user_id, selected_categories=None, selected_subcategories=None):
     """Retrieves words the user needs to review, filtering by category and subcategory."""
