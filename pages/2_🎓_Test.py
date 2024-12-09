@@ -5,19 +5,6 @@ from database import get_words, get_categories_and_subcategories
 
 ############################
 # --- Category and Subcategory Selection ---
-# with st.sidebar:
-#     st.header("Filtres")
-#     df_categories = get_categories_and_subcategories()
-#     selected_categories = st.multiselect("Categories", df_categories['category'].tolist(), key="categories")
-
-#     available_subcategories = []
-#     if selected_categories:
-#         subcategories_filtered = df_categories[df_categories['category'].isin(selected_categories)]['subcategories'].unique()
-#         available_subcategories = list(set(', '.join(subcategories_filtered).split(', '))) if subcategories_filtered.size > 0 else []
-#     selected_subcategories = st.multiselect("Subcategories", available_subcategories, key="subcategories")
-
-# words_to_review_df = get_words(selected_categories, selected_subcategories)
-
 with st.sidebar:
     st.header("Filtres")
     df_categories = get_categories_and_subcategories()
@@ -29,13 +16,7 @@ with st.sidebar:
         available_subcategories = list(set(', '.join(subcategories_filtered).split(', '))) if subcategories_filtered.size > 0 else []
     selected_subcategories = st.multiselect("Subcategories", available_subcategories, key="subcategories")
 
-    if st.button("Load data"):
-        st.session_state.filtered_df = get_words(selected_categories, selected_subcategories)
-    else:
-        st.warning("Sélectionner au moins une catégorie ou sous-catégorie pour charger les données.")
-        st.stop()
-
-words_to_review_df = st.session_state.filtered_df
+words_to_review_df = get_words(selected_categories, selected_subcategories)
 #######################################
 mots_francais = words_to_review_df['french_word'].tolist()
 mots_allemands = words_to_review_df['german_word'].tolist()
