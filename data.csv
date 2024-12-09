@@ -1,21 +1,21 @@
 french_word,german_word,category,subcategory,example_sentence
-Cuisine,die Küche,Maisons,Pièces intérieures,Die Küche ist der Ort, wo ich gerne koche. (La cuisine est l'endroit où j'aime cuisiner.)
-Salon,das Wohnzimmer,Maisons,Pièces intérieures,Wir entspannen uns gerne im Wohnzimmer. (Nous aimons nous détendre dans le salon.)
-Chambre,das Schlafzimmer,Maisons,Pièces intérieures,Ich schlafe im Schlafzimmer. (Je dors dans la chambre.)
-Salle de bain,das Badezimmer,Maisons,Pièces intérieures,Das Badezimmer hat eine Dusche und eine Badewanne. (La salle de bain a une douche et une baignoire.)
-Couloir,der Flur,Maisons,Pièces intérieures,Der Flur ist lang und hell. (Le couloir est long et lumineux.)
-Grenier,der Dachboden,Maisons,Pièces intérieures,Der Dachboden ist voller alter Möbel. (Le grenier est plein de vieux meubles.)
-Cave,der Keller,Maisons,Pièces intérieures,Wir lagern Wein im Keller. (Nous stockons du vin à la cave.)
-Buanderie,die Waschküche,Maisons,Pièces intérieures,Die Waschmaschine steht in der Waschküche. (La machine à laver est dans la buanderie.)
-Bureau,das Arbeitszimmer,Maisons,Pièces intérieures,Mein Vater arbeitet im Arbeitszimmer. (Mon père travaille dans le bureau.)
-Salle à manger,das Esszimmer,Maisons,Pièces intérieures,Wir essen im Esszimmer zu Abend. (Nous dînons dans la salle à manger.)
-Toilettes,die Toilette,Maisons,Pièces intérieures,Die Toilette ist im Erdgeschoss. (Les toilettes sont au rez-de-chaussée.)
-Escalier,die Treppe,Maisons,Pièces intérieures,Die Treppe führt in den ersten Stock. (L'escalier mène au premier étage.)
-Balcon,der Balkon,Maisons,Pièces intérieures,Wir sitzen gerne auf dem Balkon. (Nous aimons nous asseoir sur le balcon.)
-Terrasse,die Terrasse,Maisons,Pièces intérieures,Die Terrasse ist im Sommer schön. (La terrasse est agréable en été.)
-Véranda,der Wintergarten,Maisons,Pièces intérieures,Der Wintergarten ist hell und sonnig. (La véranda est lumineuse et ensoleillée.)
-Cellier,die Speisekammer,Maisons,Pièces intérieures,Die Speisekammer ist voller Lebensmittel. (Le cellier est plein de nourriture.)
-Dressing,das Ankleidezimmer,Maisons,Pièces intérieures,Ich habe ein Ankleidezimmer mit vielen Kleidern. (J'ai un dressing avec beaucoup de vêtements.)
-Hall d'entrée,die Eingangshalle,Maisons,Pièces intérieures,Die Eingangshalle ist groß und elegant. (Le hall d'entrée est grand et élégant.)
-Cage d'escalier,das Treppenhaus,Maisons,Pièces intérieures,Das Treppenhaus ist sauber und ordentlich. (La cage d'escalier est propre et bien rangée.)
-Palier,der Treppenabsatz,Maisons,Pièces intérieures,Auf dem Treppenabsatz steht eine Vase mit Blumen. (Sur le palier se trouve un vase avec des fleurs.)
+Cuisine,die Küche,Maisons,Pièces intérieures,"Die Küche ist der Ort, wo ich gerne koche."
+Salle de bain,das Badezimmer,Maisons,Pièces intérieures,"Das Badezimmer hat eine große Badewanne."
+Chambre,das Schlafzimmer,Maisons,Pièces intérieures,"Im Schlafzimmer steht ein bequemes Bett."
+Salon,das Wohnzimmer,Maisons,Pièces intérieures,"Das Wohnzimmer ist gemütlich eingerichtet."
+Salle à manger,das Esszimmer,Maisons,Pièces intérieures,"Im Esszimmer steht ein großer Tisch."
+Couloir,der Flur,Maisons,Pièces intérieures,"Der Flur ist hell und freundlich."
+Buanderie,die Waschküche,Maisons,Pièces intérieures,"Die Waschküche ist im Keller."
+Grenier,der Dachboden,Maisons,Pièces intérieures,"Der Dachboden ist voller alter Sachen."
+Cave,der Keller,Maisons,Pièces intérieures,"Der Keller ist kühl und dunkel."
+Bureau,das Arbeitszimmer,Maisons,Pièces intérieures,"Im Arbeitszimmer steht ein Schreibtisch."
+Balcon,der Balkon,Maisons,Pièces intérieures,"Der Balkon ist ein schöner Ort zum Entspannen."
+Terrasse,die Terrasse,Maisons,Pièces intérieures,"Die Terrasse ist mit Blumen geschmückt."
+Escalier,die Treppe,Maisons,Pièces intérieures,"Die Treppe führt in den ersten Stock."
+Placard,der Schrank,Maisons,Pièces intérieures,"Im Schrank hängen meine Kleider."
+Fenêtre,das Fenster,Maisons,Pièces intérieures,"Das Fenster bietet einen schönen Ausblick."
+Porte,die Tür,Maisons,Pièces intérieures,"Die Tür ist aus Holz."
+Mur,die Wand,Maisons,Pièces intérieures,"Die Wand ist weiß gestrichen."
+Sol,der Boden,Maisons,Pièces intérieures,"Der Boden ist aus Holz."
+Plafond,die Decke,Maisons,Pièces intérieures,"Die Decke ist hoch."
+Toit,das Dach,Maisons,Pièces intérieures,"Das Dach ist neu gedeckt."

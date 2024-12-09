@@ -94,4 +94,5 @@ if uploaded_file:
     validated_data = read_and_validate_csv(uploaded_file)
     if validated_data: # Check if validated data is not None
         insert_data_into_db(DATABASE_URL, validated_data)
+        st.cache_data.clear()
         st.balloons()

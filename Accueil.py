@@ -8,7 +8,7 @@ st.title("Bienvenue sur l'application de vocabulaire français-allemand !")
 st.write("""
 Cette application web simple vous aide à apprendre et à pratiquer le vocabulaire français-allemand. 
 Elle charge les données de vocabulaire à partir d'un fichier CSV (`data.csv`) et fournit une interface conviviale 
-pour parcourir, filtrer et écouter les mots et les phrases.
+pour parcourir, filtrer et écouter les mots et les phrases.a
 """)
 
 st.header("Fonctionnalités")
@@ -51,4 +51,6 @@ with st.sidebar:
             st.rerun()  # Rerun to show login screen
 
 
-
+if st.button('Clear cached data'):
+    st.cache_data.clear()
+    st.write('Cache cleared!')

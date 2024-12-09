@@ -20,13 +20,11 @@ def get_audio_base64(text):
 # --- Streamlit App ---
 st.title(':flag-fr: Français-Allemand :flag-de:')
 
+st.write("Sélectionner au moins une catégorie ou sous-catégorie.")
+
 if 'username' in st.session_state:
     if len(st.session_state.username)>0:
-        st.write(f"Vous êtes authenthifié en tant que {st.session_state.username}!")
-
-# --- Initial Values for Filters and Checkbox ---
-if "show_french" not in st.session_state:
-    st.session_state.show_french = True
+        st.write(f"Vous êtes authenthifié en tant que {st.session_state.username}!")  
 
 # --- Sidebar ---
 with st.sidebar:
@@ -40,10 +38,14 @@ with st.sidebar:
         available_subcategories = list(set(', '.join(subcategories_filtered).split(', '))) if subcategories_filtered.size > 0 else []
     selected_subcategories = st.multiselect("Subcategories", available_subcategories, key="subcategories")
 
-filtered_df = get_words(selected_categories, selected_subcategories)
+    if st.button("Load data"):
+        st.session_state.filtered_df = get_words(selected_categories, selected_subcategories)
+    else:
+        st.warning("Sélectionner au moins une catégorie ou sous-catégorie pour charger les données.")
+        st.stop()
 
 # --- Rename columns ---
-filtered_df = filtered_df.rename(columns={
+filtered_df = st.session_state.filtered_df.rename(columns={
     'category': 'Catégorie',
     'subcategory': 'Sous-catégorie',
     'french_word': 'Français',
@@ -51,34 +53,15 @@ filtered_df = filtered_df.rename(columns={
     'example_sentence': 'Exemple'
 })
 
-# --- Add TTS Column --- (unchanged)
+# --- Add TTS Column ---
 filtered_df.loc[:, 'Écouter'] = filtered_df['Allemand'].apply(get_audio_base64)
-
-# --- Show/Hide Columns ---
-col1, col2 = st.columns(2)
-with col1:
-    show_allemand = st.checkbox('Montrer Allemand', value=True)
-with col2:
-    show_french = st.checkbox('Montrer Français', value=st.session_state.show_french)
-
-columns_to_show = ['Catégorie', 'Sous-catégorie', 'Écouter', 'Exemple'] 
-if show_french and not show_allemand:
-    columns_to_show = ['Français', 'Écouter'] 
-if show_allemand and not show_french:
-    columns_to_show = ['Allemand', 'Écouter', 'Exemple'] 
-if show_allemand and show_french:
-    columns_to_show = ['Français', 'Allemand', 'Écouter', 'Exemple'] 
-
-# --- Slider ---
-if len(filtered_df) > 0:
-    num_words = st.slider('Nombre de mots', min_value=1, max_value=len(filtered_df), value=5)
-    displayed_df = filtered_df[columns_to_show].head(num_words)
 
 # --- Display DataFrame with HTML for Audio ---
 if not filtered_df.empty:
+    filtered_df = filtered_df.sample(frac=1).reset_index(drop=True)
     st.write(
-        displayed_df.to_html(
-            escape=False, formatters={"Écouter": lambda x: x}
+        filtered_df[['Français', 'Allemand', 'Écouter', 'Exemple']].to_html(
+            escape=False, formatters={"Écouter": lambda x: x}, index=False
         ),
         unsafe_allow_html=True,
     )

@@ -173,7 +173,7 @@ def get_words_to_review(user_id, selected_categories=None, selected_subcategorie
                 w.category, 
                 w.subcategory
             FROM 
-                words w
+                public.words w
             LEFT JOIN 
                 user_word_learning uwl ON w.word_id = uwl.word_id AND uwl.user_id = %s
             WHERE 1=1

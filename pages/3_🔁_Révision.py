@@ -21,6 +21,7 @@ user_id = st.session_state.get("user_id")
 if not user_id:
     st.warning("Please log in to view words to review.")
     st.stop()  # Stop execution if not logged in
+    
 words_to_review_df = get_words_to_review(user_id, selected_categories, selected_subcategories)
 #######################################
 mots_francais = words_to_review_df['french_word'].tolist()
